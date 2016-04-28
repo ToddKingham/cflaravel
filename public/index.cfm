@@ -109,6 +109,7 @@
 		return result;
 	};
 	Route = CreateObject("component","CFlaravel.routes");
+	View = CreateObject("component","CFlaravel/views");
 	include "../app/filters.cfm";
 	include "../app/routes.cfm";
 	result = Route.process(REQUEST.data.method,REQUEST.route);
@@ -116,10 +117,9 @@
 		RESPONSE.setStatus("404");
 		//TODO: MAKE THIS BETTER
 		result = "404";
+
 	}
 
 	//OUTPUT THE RESPONSE
 	writeOutput(result);
-</cfscript>	
-
-	
+</cfscript>
