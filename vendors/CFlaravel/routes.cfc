@@ -148,7 +148,10 @@ component {
 			if( NOT isSimpleValue(result)) {
 				getpagecontext().getresponse().setcontenttype('application/json; charset=utf-8');
 				result = serializeJSON(result);
+			}else if(isXML(result)){
+				getpagecontext().getresponse().setcontenttype('application/xml; charset=utf-8');
 			}
+			
 			return result;
 		
 		}
