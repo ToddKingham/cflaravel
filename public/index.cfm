@@ -109,7 +109,7 @@
 		return result;
 	};
 	Route = CreateObject("component","CFlaravel.routes");
-	View = CreateObject("component","CFlaravel/views");
+	View = CreateObject("component","CFlaravel.views");
 	include "../app/filters.cfm";
 	include "../app/routes.cfm";
 	result = Route.process(REQUEST.data.method,REQUEST.route);
