@@ -82,7 +82,7 @@ component {
 	/* PRIVATE HELPER FUNCTIONS */
 	private void function setRoute(string verb, string path, any controller){
 		var current_route = listAppend(VARIABLES.route_prefix,ARGUMENTS.path,"/");
-		var regex = '^' & REREPLACENOCASE(current_route,'({[a-z0-9- ]+})','[a-z0-9- ]+',"all") & '$';
+		var regex = '^' & REREPLACENOCASE(current_route,'({[a-z0-9-_ ]+})','[a-z0-9-_ ]+',"all") & '$';
 
 		if((REQUEST.data.method EQ ARGUMENTS.verb) AND (ReFindNoCase(regex,REQUEST.route))){
 			//set the matched route
