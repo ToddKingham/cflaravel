@@ -85,15 +85,11 @@ component {
 		var regex = '^' & REREPLACENOCASE(current_route,'({[a-z0-9-_ ]+})','[a-z0-9-_ ]+',"all") & '$';
 
 		if((REQUEST.data.method EQ ARGUMENTS.verb) AND (ReFindNoCase(regex,REQUEST.route))){
+
 			//set the matched route
 			VARIABLES.matched_route = {
 				controller = ARGUMENTS.controller,
-				filters = {
-					before = VARIABLES.matched_filters.before,
-					after = VARIABLES.matched_filters.after,
-					auth = VARIABLES.matched_filters.auth,
-					value = VARIABLES.matched_filters.value
-				},
+				filters = duplicate(VARIABLES.matched_filters),
 				match = current_route
 			};
 
@@ -106,8 +102,18 @@ component {
 		}
 	}
 
+	private any function formatResponse(result){
+		if( NOT isSimpleValue(result)) {
+			getpagecontext().getresponse().setcontenttype('application/json; charset=utf-8');
+			result = serializeJSON(result);
+		}else if(isXML(result)){
+			getpagecontext().getresponse().setcontenttype('application/xml; charset=utf-8');
+		}
+		return result;
+	};
+
 	/* THE MAIN DADDY! GET'S CALLED ONCE FROM WITHIN THE FRAMEWORK */
-	public any function process(string verb, string path){
+	public any function process(string verb, string path){  
 		var result = false;
 
 		if( isStruct(VARIABLES.matched_route) ) {
@@ -119,7 +125,8 @@ component {
 				the_filter = VARIABLES.matched_route.filters.before[i];
 				filter_result = the_filter(REQUEST.route,REQUEST,VARIABLES.matched_route.filters.value);
 		 		if( isDefined('filter_result') AND NOT isBoolean(filter_result) ){
-	    			location(url="/#filter_result#", addtoken="false");
+		 			return formatResponse(filter_result);
+	    			//location(url="/#filter_result#", addtoken="false");
 	    		}
 			}
 
@@ -134,8 +141,7 @@ component {
 			}else if( isClosure(theController) ){
 				result = theController(argumentCollection=Request.all());
 			}
-			 
-			
+
 			//PROCESS ANY AFTER FILTERS
 			var filter_result = false;
 			var the_filter = '';
@@ -152,7 +158,7 @@ component {
 				getpagecontext().getresponse().setcontenttype('application/xml; charset=utf-8');
 			}
 			
-			return result;
+			return formatResponse(result);
 		
 		}
 	}

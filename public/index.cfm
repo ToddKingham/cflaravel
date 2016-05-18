@@ -102,11 +102,10 @@
 
 	//PROCESS THE REQUEST
 	function redirect(r){
-		var result = false;
 		if(request.route NEQ r){ //this prevents infinte loops
-			result = r;
+			location(url="/#r#", addtoken="false");
+			result = {"type":"redirect","route:":r};
 		}
-		return result;
 	};
 	Route = CreateObject("component","CFlaravel.routes");
 	View = CreateObject("component","CFlaravel.views");
