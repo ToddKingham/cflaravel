@@ -31,5 +31,10 @@ component extends="CFlaravel/BaseController"{
 		var result = "insert report data";
 		return result;
 	}
+
+	function postContact(who,asdf){
+		
+		return who & asdf;
+	}
 	
 }

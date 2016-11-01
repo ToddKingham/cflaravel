@@ -3,5 +3,7 @@
 </cfsilent>
 
 
-
+ASDFASDF
 <cfoutput>#layout#</cfoutput>
+
+<CFDUMP VAR="#REQUEST#">

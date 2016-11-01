@@ -72,7 +72,12 @@ component {
 				VARIABLES.matched_filters[x] = "";
 			}
 		}
-		VARIABLES.route_prefix = "";
+
+		var deleteIndex = ListLen(VARIABLES.route_prefix,'/');
+		if(deleteIndex){
+			VARIABLES.route_prefix = listDeleteAt(VARIABLES.route_prefix,deleteIndex,'/');
+		}
+		
 	}
 
 	public void function filter(string key, function action){
