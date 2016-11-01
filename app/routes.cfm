@@ -19,6 +19,7 @@
 
 	//Route Groups can have a "before action" so we process this filter before we match the routes
 	Route.group({'after'='must_be_logged_in'},function(){
+		
 		//this route uses a closer instead of calling the controller.
 		Route.any('customers/{id}/name/{name}',function(id,name){
 			return "The customer #ARGUMENTS.name# has an ID of #ARGUMENTS.id#";
