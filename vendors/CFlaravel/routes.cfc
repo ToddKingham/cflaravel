@@ -182,7 +182,7 @@ component {
 	private void function setRoute(string verb, string path, any controller){
 		var current_route = variables.route_prefix;
 		if( (arguments.path NEQ '/') OR (!len(variables.route_prefix) )){
-			var current_route = listAppend(variables.route_prefix,arguments.path,"/");
+			current_route = listAppend(variables.route_prefix,arguments.path,"/");
 		}
 
 		var regex = '^' & REREPLACENOCASE(current_route,'({[a-z0-9-_ ]+})','[a-z0-9-_ ]+',"all") & '$';
