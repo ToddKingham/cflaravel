@@ -1,48 +1,48 @@
 component {
-	/* SET UP SOME VARIABLES */
-	VARIABLES.filters = {};
-	VARIABLES.matched_filters = {
+	/* SET UP SOME variables */
+	variables.filters = {};
+	variables.matched_filters = {
 		before = [],
 		after = [],
 		auth = [],
 		value = ""
 	};
-	VARIABLES.route_prefix = "";
-	VARIABLES.matched_route = "I will become a struct when a route is matched";
-	VARIABLES.response = getPageContext().getResponse();
+	variables.route_prefix = "";
+	variables.matched_route = "I will become a struct when a route is matched";
+	variables.response = getPageContext().getResponse();
 		
 
 	/* PUBLIC ROUTE METHODS */
 	public void function get(string path, any controller){
-		setRoute('get',ARGUMENTS.path,ARGUMENTS.controller);
+		setRoute('get',arguments.path,arguments.controller);
 	}
 	
 	public void function post(string path, any controller){
-		setRoute('post',ARGUMENTS.path,ARGUMENTS.controller);
+		setRoute('post',arguments.path,arguments.controller);
 	}
 	
 	public void function put(string path, any controller){
-		setRoute('put',ARGUMENTS.path,ARGUMENTS.controller);
+		setRoute('put',arguments.path,arguments.controller);
 	}
 	
 	public void function patch(string path, any controller){
-		setRoute('patch',ARGUMENTS.path,ARGUMENTS.controller);
+		setRoute('patch',arguments.path,arguments.controller);
 	}
 	
 	public void function delete(string path, any controller){
-		setRoute('delete',ARGUMENTS.path,ARGUMENTS.controller);
+		setRoute('delete',arguments.path,arguments.controller);
 	}
 	
 	public void function any(string path, any controller){
-		setRoute(REQUEST.data.method,ARGUMENTS.path,ARGUMENTS.controller);
+		setRoute(request.data.method,arguments.path,arguments.controller);
 	}
 
 	public void function resource(string path, string controller, struct filter={}){
-		var contr = listFirst(ARGUMENTS.controller,'@');
+		var contr = listFirst(arguments.controller,'@');
 		var actions = ['index','store','show','update','destroy'];
 
-		if(structKeyExists(ARGUMENTS.filter, 'except') AND isArray(ARGUMENTS.filter.except)){
-			for(var filter_index in ARGUMENTS.filter.except){
+		if(structKeyExists(arguments.filter, 'except') AND isArray(arguments.filter.except)){
+			for(var filter_index in arguments.filter.except){
 				var action_index = ArrayFindNoCase( actions, filter_index );
 				if(action_index){
 					arrayDeleteAt(actions,action_index);
@@ -50,78 +50,78 @@ component {
 			}
 		}
 
-		if(structKeyExists(ARGUMENTS.filter, 'only') AND isArray(ARGUMENTS.filter.only)){
-			actions = ARGUMENTS.filter.only;
+		if(structKeyExists(arguments.filter, 'only') AND isArray(arguments.filter.only)){
+			actions = arguments.filter.only;
 		}
 
 		if(ArrayFindNoCase( actions, 'index' )){
-			setRoute("get",ARGUMENTS.path,contr&"@index");
+			setRoute("get",arguments.path,contr&"@index");
 		}
 		if(ArrayFindNoCase( actions, 'store' )){
-			setRoute("post",ARGUMENTS.path,contr&"@store");
+			setRoute("post",arguments.path,contr&"@store");
 		}
 		if(ArrayFindNoCase( actions, 'show' )){
-			setRoute("get",ARGUMENTS.path&"/{resource}",contr&"@show");
+			setRoute("get",arguments.path&"/{resource}",contr&"@show");
 		}
 		if(ArrayFindNoCase( actions, 'update' )){
-			setRoute("put",ARGUMENTS.path&"/{resource}",contr&"@update"); 
-			setRoute("patch",ARGUMENTS.path&"/{resource}",contr&"@update");
+			setRoute("put",arguments.path&"/{resource}",contr&"@update"); 
+			setRoute("patch",arguments.path&"/{resource}",contr&"@update");
 		}
 		if(ArrayFindNoCase( actions, 'destroy' )){
-			setRoute("delete",ARGUMENTS.path&"/{resource}",contr&"@destroy");
+			setRoute("delete",arguments.path&"/{resource}",contr&"@destroy");
 		}
 	}
 
 	public void function group(struct actions, function cb){
 		var isPrefix = false;
-		for(var key in ARGUMENTS.actions){
+		for(var key in arguments.actions){
 			switch(key) {
 			    case "prefix":
-			    	VARIABLES.route_prefix = listAppend(VARIABLES.route_prefix,ARGUMENTS.actions[key],"/");
+			    	variables.route_prefix = listAppend(variables.route_prefix,arguments.actions[key],"/");
 			    	isPrefix = true;
 			    break;
 
 			    case "before":
-			    	var the_filter = listFirst(ARGUMENTS.actions[key],":");
-			     	if(structKeyExists(VARIABLES.filters,the_filter)){
-			    		 arrayAppend(VARIABLES.matched_filters.before,VARIABLES.filters[the_filter]);
-			    		 if(listLen(ARGUMENTS.actions[key],":") GT 1){
-			    		 	VARIABLES.matched_filters.value = listLast(ARGUMENTS.actions[key],":");
+			    	var the_filter = listFirst(arguments.actions[key],":");
+			     	if(structKeyExists(variables.filters,the_filter)){
+			    		 arrayAppend(variables.matched_filters.before,variables.filters[the_filter]);
+			    		 if(listLen(arguments.actions[key],":") GT 1){
+			    		 	variables.matched_filters.value = listLast(arguments.actions[key],":");
 			    		 }
 			       	}
 			    break;  
 
 			    case "after":
-			     	var the_filter = listFirst(ARGUMENTS.actions[key],":");
-			     	if(structKeyExists(VARIABLES.filters,the_filter)){
-			    		 arrayAppend(VARIABLES.matched_filters.after,VARIABLES.filters[the_filter]);
+			     	var the_filter = listFirst(arguments.actions[key],":");
+			     	if(structKeyExists(variables.filters,the_filter)){
+			    		 arrayAppend(variables.matched_filters.after,variables.filters[the_filter]);
 			       	}
 			    break;   
 			}	
 		}
 
-		ARGUMENTS.cb();
+		arguments.cb();
 
-		for(var x in VARIABLES.matched_filters){
-			if(isArray(VARIABLES.matched_filters[x])){
-				VARIABLES.matched_filters[x] = [];
+		for(var x in variables.matched_filters){
+			if(isArray(variables.matched_filters[x])){
+				variables.matched_filters[x] = [];
 			} else {
-				VARIABLES.matched_filters[x] = "";
+				variables.matched_filters[x] = "";
 			}
 		}
 
 		if(isPrefix){
 			var chunk_len = len(variables.route_prefix) - len(arguments.actions.prefix);
 			if(chunk_len){
-				VARIABLES.route_prefix = left(VARIABLES.route_prefix, chunk_len-1);
+				variables.route_prefix = left(variables.route_prefix, chunk_len-1);
 			} else {
-				VARIABLES.route_prefix = '';
+				variables.route_prefix = '';
 			}
 		}
 	}
 
 	public void function filter(string key, function action){
-		VARIABLES.filters[ARGUMENTS.key] = ARGUMENTS.action;
+		variables.filters[arguments.key] = arguments.action;
 	}
 
 	/* THE MAIN DADDY! GET'S CALLED ONCE FROM WITHIN THE FRAMEWORK */
@@ -129,14 +129,14 @@ component {
 		var result = false;
 
 
-		if( isStruct(VARIABLES.matched_route) ) {
+		if( isStruct(variables.matched_route) ) {
 
 			//PROCESS ANY BEFORE FILTERS
 			var filter_result = false;
 			var the_filter = '';
-			for(var i=1;i LTE arrayLen(VARIABLES.matched_route.filters.before) ;i++){
-				the_filter = VARIABLES.matched_route.filters.before[i];
-				filter_result = the_filter(REQUEST.route,REQUEST,VARIABLES.matched_route.filters.value);
+			for(var i=1;i LTE arrayLen(variables.matched_route.filters.before) ;i++){
+				the_filter = variables.matched_route.filters.before[i];
+				filter_result = the_filter(request.route,request,variables.matched_route.filters.value);
 		 		if( isDefined('filter_result') AND NOT isBoolean(filter_result) ){
 		 			return formatResponse(filter_result);
 	    			//location(url="/#filter_result#", addtoken="false");
@@ -144,13 +144,13 @@ component {
 			}
 
 			//PROCESS THE ROUTE
-			var theController = VARIABLES.matched_route.controller;
+			var theController = variables.matched_route.controller;
 			var controllerArgs = {};
-			var requestBody = Request.json();
+			var requestBody = request.json();
 
 			if(isStruct(requestBody)){
 				structAppend(controllerArgs,requestBody);
-			}structAppend(controllerArgs,Request.all());
+			}structAppend(controllerArgs,request.all());
 			
 				
 			if( isSimpleValue(theController)) {
@@ -168,9 +168,9 @@ component {
 			//PROCESS ANY AFTER FILTERS
 			var filter_result = false;
 			var the_filter = '';
-			for(var i=1;i LTE arrayLen(VARIABLES.matched_route.filters.after) ;i++){
-				the_filter = VARIABLES.matched_route.filters.after[i];
-				result = the_filter(REQUEST.route,REQUEST,result);
+			for(var i=1;i LTE arrayLen(variables.matched_route.filters.after) ;i++){
+				the_filter = variables.matched_route.filters.after[i];
+				result = the_filter(request.route,request,result);
 		 	}
 
 			//RETURN THE RESPONSE
@@ -180,36 +180,36 @@ component {
 	}
 
 	private void function setRoute(string verb, string path, any controller){
-		var current_route = VARIABLES.route_prefix;
-		if(ARGUMENTS.path NEQ '/' OR (!len(VARIABLES.route_prefix) )){
-			var current_route = listAppend(VARIABLES.route_prefix,ARGUMENTS.path,"/");
+		var current_route = variables.route_prefix;
+		if( (arguments.path NEQ '/') OR (!len(variables.route_prefix) )){
+			var current_route = listAppend(variables.route_prefix,arguments.path,"/");
 		}
 
 		var regex = '^' & REREPLACENOCASE(current_route,'({[a-z0-9-_ ]+})','[a-z0-9-_ ]+',"all") & '$';
-		if((REQUEST.data.method EQ ARGUMENTS.verb) AND (ReFindNoCase(regex,REQUEST.route))){
+		if((request.data.method EQ arguments.verb) AND (ReFindNoCase(regex,request.route))){
 
 			//set the matched route
-			VARIABLES.matched_route = {
-				controller = ARGUMENTS.controller,
-				filters = duplicate(VARIABLES.matched_filters),
+			variables.matched_route = {
+				controller = arguments.controller,
+				filters = duplicate(variables.matched_filters),
 				match = current_route
 			};
 
 			//process any slugs
 			var route_array = listToArray(current_route,'/');
-			var url_array = listToArray(REQUEST.route,'/');
+			var url_array = listToArray(request.route,'/');
 			for(var key in REmatch('{[^}]*}',current_route)){
-				REQUEST.parameters[rereplace(key,'[{}]','','all')] = url_array[arrayFindNoCase(route_array,key)];
+				request.parameters[rereplace(key,'[{}]','','all')] = url_array[arrayFindNoCase(route_array,key)];
 			}
 		}
 	}
 
 	private any function formatResponse(result){
 		if( NOT isSimpleValue(result)) {
-			VARIABLES.response.setcontenttype('application/json; charset=utf-8');
+			variables.response.setcontenttype('application/json; charset=utf-8');
 			result = serializeJSON(result);
 		}else if(isXML(result)){
-			VARIABLES.response.setcontenttype('application/xml; charset=utf-8');
+			variables.response.setcontenttype('application/xml; charset=utf-8');
 		}
 		return result;
 	};
