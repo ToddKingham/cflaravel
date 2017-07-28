@@ -70,10 +70,7 @@ component {
 		if(ArrayFindNoCase( actions, 'destroy' )){
 			setRoute("delete",ARGUMENTS.path&"/{resource}",contr&"@destroy");
 		}
-
 	}
-
-	
 
 	public void function group(struct actions, function cb){
 		var isPrefix = false;
@@ -102,9 +99,9 @@ component {
 			    break;   
 			}	
 		}
-		
+
 		ARGUMENTS.cb();
-		
+
 		for(var x in VARIABLES.matched_filters){
 			if(isArray(VARIABLES.matched_filters[x])){
 				VARIABLES.matched_filters[x] = [];
@@ -127,7 +124,6 @@ component {
 		VARIABLES.filters[ARGUMENTS.key] = ARGUMENTS.action;
 	}
 
-	
 	/* THE MAIN DADDY! GET'S CALLED ONCE FROM WITHIN THE FRAMEWORK */
 	public any function process(string verb, string path){  
 		var result = false;
@@ -183,9 +179,12 @@ component {
 		}
 	}
 
-	
 	private void function setRoute(string verb, string path, any controller){
-		var current_route = listAppend(VARIABLES.route_prefix,ARGUMENTS.path,"/");
+		var current_route = VARIABLES.route_prefix;
+		if(ARGUMENTS.path NEQ '/' OR (!len(VARIABLES.route_prefix) )){
+			var current_route = listAppend(VARIABLES.route_prefix,ARGUMENTS.path,"/");
+		}
+
 		var regex = '^' & REREPLACENOCASE(current_route,'({[a-z0-9-_ ]+})','[a-z0-9-_ ]+',"all") & '$';
 		if((REQUEST.data.method EQ ARGUMENTS.verb) AND (ReFindNoCase(regex,REQUEST.route))){
 
@@ -195,8 +194,6 @@ component {
 				filters = duplicate(VARIABLES.matched_filters),
 				match = current_route
 			};
-
-
 
 			//process any slugs
 			var route_array = listToArray(current_route,'/');
