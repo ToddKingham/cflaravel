@@ -2,7 +2,7 @@ component {
 /*
     NOTES: we create a set of "verb functions": get(), post(), etc... and we set them to empty functions. On init() we 
     determine the request method, match it to one of the verb functions, and alias that funtion to any() which is the
-    function that does the actual work. In this way we prevent extrainous pocessing from Route declarations that have 
+    function that does the actual work. In this way we prevent extraneous pocessing from Route declarations that have 
     no chance of matching. ie... A GET /v1/dogs  request to the server could never match a Route.post() route so why 
     attempt to process it.
 */
@@ -68,9 +68,6 @@ component {
             }
         }
         public function any(string path, any controller){
-            
-            
-
             if(listLen(arguments.path, '/')+listLen(variables.route.prefix, '/') EQ listLen(variables.target_route, '/')){
                 variables.route.is_matched = appendRegexRoute(arguments.path);
                 if(variables.route.is_matched){
