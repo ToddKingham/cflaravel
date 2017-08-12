@@ -1,6 +1,4 @@
 <cfscript>
-	setting showdebugoutput="false";
-
 	//SET RESPONSE
 	RESPONSE = getPageContext().getResponse();
 
@@ -77,7 +75,7 @@
 	REQUEST.route = replace(ORIGINAL_URL,'/','');
 	//REQUEST.route = replaceNoCase(ORIGINAL_URL,getDirectoryFromPath(cgi.SCRIPT_NAME),'');
 	if( NOT len(trim(REQUEST.route)) ){
-		REQUEST.route = "/";
+		REQUEST.route = "";
 	}
 
 	//PARSE THE REQUEST BODY
@@ -107,15 +105,16 @@
 			result = {"type":"redirect","route:":r};
 		}
 	};
-	Route = CreateObject("component","CFlaravel.routes");
+
+	Route = CreateObject("component","CFlaravel.routes").init(REQUEST.data.method,REQUEST.route);
 	View = CreateObject("component","CFlaravel.views");
 	include "../app/filters.cfm";
 	include "../app/routes.cfm";
 	result = Route.process(REQUEST.data.method,REQUEST.route);
-	if( NOT isDefined("result") ){
+	if( result EQ "nil" ){
 		RESPONSE.setStatus("404");
 		//TODO: MAKE THIS BETTER
-		result = "404";
+		result = "404 Not Found";
 
 	}
 
