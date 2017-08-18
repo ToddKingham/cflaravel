@@ -2,7 +2,7 @@ component {
 /*
     NOTES: we create a set of "verb functions": get(), post(), etc... and we set them to empty functions. On init() we 
     determine the request method, match it to one of the verb functions, and alias that funtion to any() which is the
-    function that does the actual work. In this way we prevent extraneous pocessing from Route declarations that have 
+    function that does the actual work. In this way we prevent extrainous pocessing from Route declarations that have 
     no chance of matching. ie... A GET /v1/dogs  request to the server could never match a Route.post() route so why 
     attempt to process it.
 */
@@ -67,8 +67,12 @@ component {
                 this.delete(arguments.path&"/{resource}", ctrlr&"@destroy");
             }
         }
-        public function any(string path, any controller){
-            if(listLen(arguments.path, '/')+listLen(variables.route.prefix, '/') EQ listLen(variables.target_route, '/')){
+        public function any(string path){
+            var argsLen = structCount(arguments);
+                arguments.config = (argsLen EQ 3 OR isStruct(arguments.2)) ? arguments.2 : {};
+                arguments.controller = (structKeyExists(arguments.config, "use")) ? arguments.config.use : arguments[argsLen];
+           
+           if(listLen(arguments.path, '/')+listLen(variables.route.prefix, '/') EQ listLen(variables.target_route, '/')){
                 variables.route.is_matched = appendRegexRoute(arguments.path);
                 if(variables.route.is_matched){
                     variables.route.action = arguments.controller;
@@ -78,6 +82,14 @@ component {
                     //once we get a match, set these back to empty functions to stop extra processing
                     this[variables.target_verb] = function(){};
                     this.group = function(){};
+
+                    //process any filters
+                    if(structKeyExists(arguments.config, "before")){
+                        var befores = isArray(arguments.config.before) ? arguments.config.before : listToArray(arguments.config.before,"|");
+                        for(var before in befores){
+                            setRouteFilter("before", before);
+                        }
+                    }
                 } 
             }
         }
@@ -106,13 +118,7 @@ component {
 
                     case "before":
                     case "after":
-                        filter_name = listFirst(arguments.actions[action],":");
-                        arrayPrepend(variables.route.filters[action], filter_name);
-
-                        if(listLen(arguments.actions[action],":") EQ 2){
-                            variables.route.filters.value = listLast(arguments.actions[action],":");
-                        }
-
+                        setRouteFilter(action, arguments.actions[action]);
                         arguments.cb(argumentCollection = variables.route.slugs);
                         if(NOT variables.route.is_matched){
                             variables.route.filters = {before: [], after: [], auth: "", value: ""};
@@ -219,8 +225,15 @@ component {
         private function appendWhenFilters(){
             for(var key in variables.when_filters){
                 if(REFind("^"&listFirst(key,"*"), variables.route.path)){
-                    arrayPrepend(variables.route.filters.before,variables.when_filters[key]);
+                    setRouteFilter("before",variables.when_filters[key]);
                 }
+            }
+        }
+        private function setRouteFilter(action, value){
+            filter_name = listFirst(arguments.value,":");
+            arrayAppend(variables.route.filters[action], filter_name);
+            if(listLen(value,":") EQ 2){
+                variables.route.filters.value = listLast(arguments.value,":");
             }
         }
     /*** /PRIVATE FUNCTIONS ***/
