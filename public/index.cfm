@@ -43,6 +43,13 @@
 	REQUEST.json = function(){
 		return false;
 	};
+	REQUEST.header = function(header){
+		var result = false;
+		if(structKeyExists(REQUEST.data.headers, arguments.header)){
+			result = REQUEST.data.headers[arguments.header];
+		}
+		return result;
+	}
 
 	private function ArgumentsArray(struct args){
 		var r = [];
