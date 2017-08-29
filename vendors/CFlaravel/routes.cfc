@@ -17,7 +17,7 @@ component {
         action: "", //this will be a controller reference: MyController@SomeMethod  or a Closure.
         slugs: {}, //I will hold all the slug values for the matched route.
         filters: {before: [], after: [], auth: "", value: ""} //I will hold all the requested filters for the matched route to be executed in process()
-    }
+    };
 
     this.input = variables.route.slugs; //I will be an object of slugs
 
@@ -137,13 +137,15 @@ component {
                 // PROCESS BEFORE FILTERS
                 var filter_result = false;
                 var filter_args = {};
+                var befores = function(){};
                 for(var before in variables.route.filters.before){
                     filter_args = {
                         $route: variables.target_route,
                         $request: request,
                         $value: variables.route.filters.value
                     };
-                  filter_result = variables.filters[before](argumentCollection=filter_args);
+                  befores = variables.filters[before];
+                  filter_result = befores(argumentCollection=filter_args); //CF can't handle this syntax: variables.filters[before](argumentCollection=filter_args);
                   bypass_route = NOT (isNull(filter_result) OR (isBoolean(filter_result) AND NOT filter_result));
                   if( bypass_route ){
                    return formatResponse(filter_result);
@@ -163,13 +165,15 @@ component {
 
                 // PROCESS AFTER FILTERS
                 var filter_args = {};
+                var afters = function(){};
                 for(var after in variables.route.filters.after){
                     filter_args = {
                         $route: variables.target_route,
                         $request: request,
                         $response: result
                     };
-                  filter_result = variables.filters[after](argumentCollection=filter_args);
+                  afters = variables.filters[after];
+                  filter_result = afters(argumentCollection=filter_args);//variables.filters[after](argumentCollection=filter_args);
                   if(NOT isNull(filter_result)){
                     result = filter_result;
                   }
@@ -203,7 +207,7 @@ component {
                     result = true;
                     variables.route.prefix = prefix;
 
-                    listMap(prefix, function(string key, number idx){ //put the slugs into a global variable for later use
+                    listMap(prefix, function(string key, numeric idx){ //put the slugs into a global variable for later use
                         if(REFind("^{[^}]*}$", arguments.key)){
                             variables.route.slugs[REReplace(arguments.key, "{|}", "", "all")] = listGetAt(target_segment, idx, '/');
                         }
