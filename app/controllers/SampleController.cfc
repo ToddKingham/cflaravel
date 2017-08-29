@@ -10,7 +10,7 @@ component extends="CFlaravel/BaseController"{
 	}
 
 	function contactus(){
-		return View.make("Global_Layout",{layout=View.make("layouts.Contact_Us",{layout="Contact you"})});
+		return View.make("Global_Layout",{layout=View.make("layouts.Contact_Us",{layout="Contact Us"})});
 	}
 
 	function faqs(){
