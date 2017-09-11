@@ -49,7 +49,7 @@
 			result = REQUEST.data.headers[arguments.header];
 		}
 		return result;
-	}
+	};
 
 	private function ArgumentsArray(struct args){
 		var r = [];

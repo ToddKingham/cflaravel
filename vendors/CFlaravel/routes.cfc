@@ -1,22 +1,22 @@
 component {   
 /*
-    NOTES: we create a set of "verb functions": get(), post(), etc... and we set them to empty functions. On init() we 
+    NOTES: we create a set of 'verb functions': get(), post(), etc... and we set them to empty functions. On init() we 
     determine the request method, match it to one of the verb functions, and alias that funtion to any() which is the
     function that does the actual work. In this way we prevent extrainous pocessing from Route declarations that have 
     no chance of matching. ie... A GET /v1/dogs  request to the server could never match a Route.post() route so why 
     attempt to process it.
 */
-    variables.target_verb = ""; //I'm a local copy of the actual request method passed to the server in the request.
-    variables.target_route = ""; //I'm a local copy of the actual route passed to the server in the request.
+    variables.target_verb = ''; //I'm a local copy of the actual request method passed to the server in the request.
+    variables.target_route = ''; //I'm a local copy of the actual route passed to the server in the request.
     variables.filters = {}; //I will hold all of the global filters defined via Route.filter().
     variables.when_filters = {}; //I will hold the filters passed in on the when() function until they are matched and ready to go into the variables.route.filtes object.
     variables.route = {
         is_matched = false, //becomes True when we match a route.
-        path: "", //I will hold the concatinated path once a match has been made.
-        prefix: "", //I'm a concatination of prefixes and route paths (helps Route.group>prefix actually work)
-        action: "", //this will be a controller reference: MyController@SomeMethod  or a Closure.
+        path: '', //I will hold the concatinated path once a match has been made.
+        prefix: '', //I'm a concatination of prefixes and route paths (helps Route.group>prefix actually work)
+        action: '', //this will be a controller reference: MyController@SomeMethod  or a Closure.
         slugs: {}, //I will hold all the slug values for the matched route.
-        filters: {before: [], after: [], auth: "", value: ""} //I will hold all the requested filters for the matched route to be executed in process()
+        filters: {before: [], after: [], auth: '', value: ''} //I will hold all the requested filters for the matched route to be executed in process()
     };
 
     this.input = variables.route.slugs; //I will be an object of slugs
@@ -24,7 +24,7 @@ component {
     public function init(string verb, string route){
         variables.target_verb = arguments.verb;
         variables.target_route = arguments.route;
-        this[variables.target_verb] = this.any; //alias the appropriate "verb" function.
+        this[variables.target_verb] = this.any; //alias the appropriate 'verb' function.
         return this;
     }
 
@@ -51,26 +51,26 @@ component {
                 }
             }
             if(ArrayFindNoCase( actions, 'index' )){
-                this.get(arguments.path, ctrlr&"@index");
+                this.get(arguments.path, ctrlr&'@index');
             }
             if(ArrayFindNoCase( actions, 'store' )){
-                this.post(arguments.path, ctrlr&"@store");
+                this.post(arguments.path, ctrlr&'@store');
             }
             if(ArrayFindNoCase( actions, 'show' )){
-                this.get(arguments.path&"/{resource}", ctrlr&"@show");
+                this.get(arguments.path&'/{resource}', ctrlr&'@show');
             }
             if(ArrayFindNoCase( actions, 'update' )){
-                this.put(arguments.path&"/{resource}", ctrlr&"@update"); 
-                this.patch(arguments.path&"/{resource}", ctrlr&"@update");
+                this.put(arguments.path&'/{resource}', ctrlr&'@update'); 
+                this.patch(arguments.path&'/{resource}', ctrlr&'@update');
             }
             if(ArrayFindNoCase( actions, 'destroy' )){
-                this.delete(arguments.path&"/{resource}", ctrlr&"@destroy");
+                this.delete(arguments.path&'/{resource}', ctrlr&'@destroy');
             }
         }
         public function any(string path){
             var argsLen = structCount(arguments);
                 arguments.config = (argsLen EQ 3 OR isStruct(arguments.2)) ? arguments.2 : {};
-                arguments.controller = (structKeyExists(arguments.config, "use")) ? arguments.config.use : arguments[argsLen];
+                arguments.controller = (structKeyExists(arguments.config, 'use')) ? arguments.config.use : arguments[argsLen];
            
            if(listLen(arguments.path, '/')+listLen(variables.route.prefix, '/') EQ listLen(variables.target_route, '/')){
                 variables.route.is_matched = appendRegexRoute(arguments.path);
@@ -84,10 +84,10 @@ component {
                     this.group = function(){};
 
                     //process any filters
-                    if(structKeyExists(arguments.config, "before")){
-                        var befores = isArray(arguments.config.before) ? arguments.config.before : listToArray(arguments.config.before,"|");
+                    if(structKeyExists(arguments.config, 'before')){
+                        var befores = isArray(arguments.config.before) ? arguments.config.before : listToArray(arguments.config.before, '|');
                         for(var before in befores){
-                            setRouteFilter("before", before);
+                            setRouteFilter('before', before);
                         }
                     }
                 } 
@@ -106,22 +106,22 @@ component {
         }
         public function group(struct actions, function cb){ //I add prefixes and before/after filtes to the variables.route object when Route.group() is called.
             var success = false;
-            var filter_name = "";
+            var filter_name = '';
             for(var action in arguments.actions){
                 switch(action){
-                    case "prefix":
+                    case 'prefix':
                         if(appendRegexRoute(actions[action])){
                             arguments.cb(argumentCollection = variables.route.slugs);
-                            variables.route.prefix = "";
+                            variables.route.prefix = '';
                         }
                     break;
 
-                    case "before":
-                    case "after":
+                    case 'before':
+                    case 'after':
                         setRouteFilter(action, arguments.actions[action]);
                         arguments.cb(argumentCollection = variables.route.slugs);
                         if(NOT variables.route.is_matched){
-                            variables.route.filters = {before: [], after: [], auth: "", value: ""};
+                            variables.route.filters = {before: [], after: [], auth: '', value: ''};
                         }
                     break;
                 }
@@ -132,7 +132,7 @@ component {
     /*** MAIN FUNCTION: this is called from within the framework index.cfm file. It makes all the magic happen ***/
         public function process(){
             appendWhenFilters();
-            var result = "";
+            var result = '';
             if(variables.route.is_matched){
                 // PROCESS BEFORE FILTERS
                 var filter_result = false;
@@ -140,8 +140,8 @@ component {
                 var befores = function(){};
                 for(var before in variables.route.filters.before){
                     filter_args = {
-                        $route: variables.target_route,
-                        $request: request,
+                        $route: variables.target_route, 
+                        $request: request, 
                         $value: variables.route.filters.value
                     };
                   befores = variables.filters[before];
@@ -155,8 +155,8 @@ component {
                 // PROCESS THE ROUTE
                 if( isSimpleValue(variables.route.action)) {
                     result = invoke(
-                        "/controllers/#ListFirst(variables.route.action, "@")#", 
-                        ListLast(variables.route.action, "@"), 
+                        '/controllers/#ListFirst(variables.route.action, '@')#', 
+                        ListLast(variables.route.action, '@'), 
                         {argumentCollection=variables.route.slugs}
                     );
                 }else if( isClosure(variables.route.action) ){
@@ -168,8 +168,8 @@ component {
                 var afters = function(){};
                 for(var after in variables.route.filters.after){
                     filter_args = {
-                        $route: variables.target_route,
-                        $request: request,
+                        $route: variables.target_route, 
+                        $request: request, 
                         $response: result
                     };
                   afters = variables.filters[after];
@@ -191,14 +191,14 @@ component {
         private function appendRegexRoute(string str){ 
             var result = false;
             var prefix = variables.route.prefix;
-                if(arguments.str NEQ "/"){ //to prevent "base routes" adding an extra "/" to our path we will pretend they don't exist by only concatinating the path to the prefix when it isn't a base route.
-                    prefix = listAppend(prefix, arguments.str, "/");
+                if(arguments.str NEQ '/'){ //to prevent 'base routes' adding an extra '/' to our path we will pretend they don't exist by only concatinating the path to the prefix when it isn't a base route.
+                    prefix = listAppend(prefix, arguments.str, '/');
                 }
             var prefix_len = listLen(prefix, '/');
 
             if(prefix_len <= listLen(variables.target_route, '/')){
-                var regex = '^' & REreplaceNoCase(prefix, '({[a-z0-9-_ ]+})', '[a-z0-9-_ ]+', "all") & '$';
-                var target_segment = "";
+                var regex = '^' & REreplaceNoCase(prefix, '({[a-z0-9-_ ]+})', '[a-z0-9-_ ]+', 'all') & '$';
+                var target_segment = '';
                 for(var i=1;i<=prefix_len;i++){
                     target_segment = listAppend(target_segment, listGetAt(variables.target_route, i, '/'), '/');
                 }
@@ -208,8 +208,8 @@ component {
                     variables.route.prefix = prefix;
 
                     listMap(prefix, function(string key, numeric idx){ //put the slugs into a global variable for later use
-                        if(REFind("^{[^}]*}$", arguments.key)){
-                            variables.route.slugs[REReplace(arguments.key, "{|}", "", "all")] = listGetAt(target_segment, idx, '/');
+                        if(REFind('^{[^}]*}$', arguments.key)){
+                            variables.route.slugs[REReplace(arguments.key, '{|}', '', 'all')] = listGetAt(target_segment, idx, '/');
                         }
                     }, '/');
                 }
@@ -228,16 +228,16 @@ component {
         }
         private function appendWhenFilters(){
             for(var key in variables.when_filters){
-                if(REFind("^"&listFirst(key,"*"), variables.route.path)){
-                    setRouteFilter("before",variables.when_filters[key]);
+                if(REFind('^'&listFirst(key, '*'), variables.route.path)){
+                    setRouteFilter('before', variables.when_filters[key]);
                 }
             }
         }
         private function setRouteFilter(action, value){
-            filter_name = listFirst(arguments.value,":");
+            filter_name = listFirst(arguments.value, ':');
             arrayAppend(variables.route.filters[action], filter_name);
-            if(listLen(value,":") EQ 2){
-                variables.route.filters.value = listLast(arguments.value,":");
+            if(listLen(value, ':') EQ 2){
+                variables.route.filters.value = listLast(arguments.value, ':');
             }
         }
     /*** /PRIVATE FUNCTIONS ***/

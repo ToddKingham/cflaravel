@@ -18,13 +18,19 @@
 	});
 
 	//Route Groups can have a "before action" so we process this filter before we match the routes
-	Route.group({'after'='must_be_logged_in'},function(){
+	Route.group({'before'='must_be_logged_in:true'},function(){
 		
-		//this route uses a closer instead of calling the controller.
+		//this route uses a closure instead of calling the controller.
 		Route.any('customers/{id}/name/{name}',function(id,name){
 			return "The customer #ARGUMENTS.name# has an ID of #ARGUMENTS.id#";
 		});
 	});
+
+	Route.get('foo', {
+        before: 'must_be_logged_in:true' 
+    },function(){
+            return 'this is foo';
+        });
 
 	Route.post('blogs',function(){
 		//If you post a message body you can get to it using the Request.json() method
