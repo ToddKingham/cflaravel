@@ -9,7 +9,7 @@ component {
     variables.target_verb = ''; //I'm a local copy of the actual request method passed to the server in the request.
     variables.target_route = ''; //I'm a local copy of the actual route passed to the server in the request.
     variables.filters = {}; //I will hold all of the global filters defined via Route.filter().
-    variables.when_filters = {}; //I will hold the filters passed in on the when() function until they are matched and ready to go into the variables.route.filtes object.
+    variables.when_filters = {}; //I will hold the filters passed in on the when() function until they are matched and ready to go into the variables.route.filters object.
     variables.route = {
         is_matched = false, //becomes True when we match a route.
         path: '', //I will hold the concatinated path once a match has been made.
@@ -99,12 +99,12 @@ component {
         public function filter(string key, function cb){ //I add filters to the variables.filte object when a filter is envoked via the Route.filter() function.
             variables.filters[arguments.key] = arguments.cb;
         }
-        public function when(string path, string filter, array except=[]){ //I add filters to the variables.when_filtes object when a filter is envoked via the Route.when() function. when we process the route, this filtes will become Before:filters
+        public function when(string path, string filter, array except=[]){ //I add filters to the variables.when_filters object when a filter is envoked via the Route.when() function. when we process the route, this filters will become Before:filters
             if(NOT arrayFindNoCase(arguments.except, variables.target_verb)){
                 variables.when_filters[arguments.path] = arguments.filter;
             }
         }
-        public function group(struct actions, function cb){ //I add prefixes and before/after filtes to the variables.route object when Route.group() is called.
+        public function group(struct actions, function cb){ //I add prefixes and before/after filters to the variables.route object when Route.group() is called.
             var success = false;
             var filter_name = '';
             for(var action in arguments.actions){
